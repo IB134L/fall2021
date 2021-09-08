@@ -1,0 +1,29 @@
+Clean script 
+
+0) Install programs 
+
+conda install -c bioconda blast bowtie2 fastqc trimmomatic
+
+1) FastQC
+
+fastqc 2671*
+
+3) Trimmomatic
+
+trimmomatic PE -threads 4 2671_S24_R1_001.fastq 2671_S24_R1_001.fastq 2671_S24_R1.trimmed.fastq  2671_S24_R1.un.trimmed.fastq 2671_S24_R2.trimmed.fastq 2671_S24_R2.un.trimmed.fastq ILLUMINACLIP:TruSeq3-PE-2.fa:2:30:10:8:TRUE	LEADING:15 TRAILING:15 SLIDINGWINDOW:4:20 MINLEN:50
+
+4) FastQC after trimmomatic 
+
+fastqc *trimmed.fastqc
+
+5) Bowtie2 against mitochondrial DNA
+
+bowtie2 --very-fast-local -x neroda_mit/neroda_mit -U 2671_S24_R1.un.trimmed.fastq, 2671_S24_R2.un.trimmed.fastq --al ./2671_trimmed.mit.fastq -S ./2671_trimmed.mit.sam
+
+6) From fastq to fasta
+
+sed -n '1~4s/^@/>/p;2~4p' 2671_trimmed.mit.fastq out_2671_trimmed.mit.fa
+
+7) Blast online database
+
+blastn -db nt -query out_2671_trimmed.mit.fa -remote -out blast_out_2671_trimmed.mit.fa
